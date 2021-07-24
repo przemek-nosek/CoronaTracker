@@ -15,7 +15,7 @@ public class CoronaVirusTrackerApplication {
 
 
     public static void main(String[] args) {
-        SpringApplication.run(CoronaVirusTrackerApplication.class, args); //fsafsafa
+        SpringApplication.run(CoronaVirusTrackerApplication.class, args);
     }
 
 

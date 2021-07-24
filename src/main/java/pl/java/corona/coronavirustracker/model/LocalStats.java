@@ -24,6 +24,13 @@ public class LocalStats {
         this.dailyConfirmedCases = dailyConfirmedCases;
     }
 
+    public LocalStats(String state, String country, int dailyConfirmedCases, int totalCases) {
+        this.state = state;
+        this.country = country;
+        this.dailyConfirmedCases = dailyConfirmedCases;
+        this.totalCases = totalCases;
+    }
+
     public Long getId() {
         return id;
     }
