@@ -24,11 +24,11 @@ import java.util.List;
 @Service
 public class LocalStatsService {
 
-    private Logger logger = LoggerFactory.getLogger(LocalStatsService.class);
+    private final Logger logger = LoggerFactory.getLogger(LocalStatsService.class);
 
     private static final String CSV_CORONA_VIRUS_DATA = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
 
-    private LocalStatsRepository repository;
+    private final LocalStatsRepository repository;
 
     private List<LocalStats> localStatsDetails = new ArrayList<>();
 
@@ -37,7 +37,7 @@ public class LocalStatsService {
         this.repository = repository;
     }
 
-    @Scheduled(cron = "* * 1 * * *")
+    @Scheduled(cron = "* 10 1 * * *")
     @PostConstruct
     public void getCoronaVirusData() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -49,14 +49,19 @@ public class LocalStatsService {
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         localStatsDetails = readCsvFile(httpResponse);
 
+        updateDb(localStatsDetails);
+        localStatsDetails.clear();
+    }
+
+    private void updateDb(List<LocalStats> stats) {
         if (repository.count() == 0) {
-            repository.saveAll(localStatsDetails);
+            repository.saveAll(stats);
         } else {
-            for (int i = 0; i < localStatsDetails.size(); i++) {
-                LocalStats localStatsDetail = localStatsDetails.get(i);
+            for (int i = 0; i < stats.size(); i++) {
+                LocalStats localStatsDetail = stats.get(i);
                 int newCases = localStatsDetail.getDailyConfirmedCases();
                 int newTotalCases = localStatsDetail.getTotalCases();
-                repository.updateById(newCases, newTotalCases, (long) i);
+                repository.updateById(newCases, newTotalCases, (long) i + 1);
             }
         }
     }
@@ -69,12 +74,9 @@ public class LocalStatsService {
         for (CSVRecord record : records) {
             String state = record.get("Province/State");
             String country = record.get("Country/Region");
-            int cases = Integer.parseInt(record.get(record.size() - 1));
-            int totalCases = 0;
-            for (int i = 4; i < record.size(); i++) {
-                totalCases += Integer.parseInt(record.get(i));
-            }
-            localStats.add(new LocalStats(state, country, cases, totalCases));
+            int totalCases = Integer.parseInt(record.get(record.size() - 1));
+            int dailyCases = totalCases - Integer.parseInt(record.get(record.size() - 2));
+            localStats.add(new LocalStats(state, country, dailyCases, totalCases));
         }
         return localStats;
     }
@@ -83,7 +85,8 @@ public class LocalStatsService {
         return repository.findAll();
     }
 
-    public List<LocalStats> getLocalStatsDetails() {
-        return localStatsDetails;
+    public List<LocalStats> getAllOrderByTotalCases() {
+        return repository.OrderByTotalCasesDesc();
     }
+
 }

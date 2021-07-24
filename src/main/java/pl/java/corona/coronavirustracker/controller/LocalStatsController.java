@@ -20,6 +20,11 @@ public class LocalStatsController {
 
     @GetMapping("/cases")
     public List<LocalStats> getAllStats() {
-        return localStatsService.getLocalStatsDetails();
+        return localStatsService.getAllStats();
+    }
+
+    @GetMapping("/cases/top")
+    public List<LocalStats> getAllOrderByTotalCases() {
+        return localStatsService.getAllOrderByTotalCases();
     }
 }
