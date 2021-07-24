@@ -30,14 +30,12 @@ public class LocalStatsService {
 
     private final LocalStatsRepository repository;
 
-    private List<LocalStats> localStatsDetails = new ArrayList<>();
-
     @Autowired
     public LocalStatsService(LocalStatsRepository repository) {
         this.repository = repository;
     }
 
-    @Scheduled(cron = "* 10 1 * * *")
+    @Scheduled(cron = "* 1 1 * * *")
     @PostConstruct
     public void getCoronaVirusData() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -47,7 +45,7 @@ public class LocalStatsService {
                 .build();
 
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        localStatsDetails = readCsvFile(httpResponse);
+        List<LocalStats> localStatsDetails = readCsvFile(httpResponse);
 
         updateDb(localStatsDetails);
         localStatsDetails.clear();
@@ -61,7 +59,7 @@ public class LocalStatsService {
                 LocalStats localStatsDetail = stats.get(i);
                 int newCases = localStatsDetail.getDailyConfirmedCases();
                 int newTotalCases = localStatsDetail.getTotalCases();
-                repository.updateById(newCases, newTotalCases, (long) i + 1);
+                repository.updateStats(newCases, newTotalCases, (long) i + 1);
             }
         }
     }

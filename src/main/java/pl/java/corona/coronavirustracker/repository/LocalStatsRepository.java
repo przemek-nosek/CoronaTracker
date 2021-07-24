@@ -16,7 +16,7 @@ public interface LocalStatsRepository extends JpaRepository<LocalStats, Long> {
     @Modifying
     @Transactional
     @Query("update LocalStats l set l.dailyConfirmedCases=:newCases, l.totalCases=:newTotalCases where l.id=:id")
-    void updateById(@Param("newCases") int newCases, @Param("newTotalCases") int newTotalCases, @Param("id") Long id);
+    void updateStats(@Param("newCases") int newCases, @Param("newTotalCases") int newTotalCases, @Param("id") Long id);
 
     List<LocalStats> OrderByTotalCasesDesc();
 }
