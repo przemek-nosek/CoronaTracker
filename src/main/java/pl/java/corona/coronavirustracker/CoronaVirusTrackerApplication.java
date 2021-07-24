@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CoronaVirusTrackerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CoronaVirusTrackerApplication.class, args);
+        SpringApplication.run(CoronaVirusTrackerApplication.class, args); //fsafsafa
     }
 
 }
