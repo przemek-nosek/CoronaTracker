@@ -37,7 +37,7 @@ public class LocalStatsService {
 
     @Scheduled(cron = "* 1 1 * * *")
     @PostConstruct
-    public void getCoronaVirusData() throws IOException, InterruptedException {
+    private void getCoronaVirusData() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(CSV_CORONA_VIRUS_DATA))
@@ -50,6 +50,7 @@ public class LocalStatsService {
         updateDb(localStatsDetails);
         localStatsDetails.clear();
     }
+
 
     private void updateDb(List<LocalStats> stats) {
         if (repository.count() == 0) {

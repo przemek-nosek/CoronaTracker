@@ -24,13 +24,6 @@ public class LocalStatsController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("locationStats", localStatsService.getAllStats());
-
-        return "home";
-    }
-
-    @GetMapping("/sorted")
-    public String homeSorted(Model model) {
         List<LocalStats> allStats = localStatsService.getAllStats();
 
         List<LocalStats> collect = allStats.stream()
@@ -45,16 +38,13 @@ public class LocalStatsController {
 
         model.addAttribute("todayTotalCases", todayTotalCases);
 
+        int totalCases = allStats.stream()
+                .map(LocalStats::getTotalCases)
+                .reduce(0, Integer::sum);
+
+        model.addAttribute("totalCases", totalCases);
+
         return "home";
     }
 
-//    @GetMapping("/cases")
-//    public List<LocalStats> getAllStats() {
-//        return localStatsService.getAllStats();
-//    }
-//
-//    @GetMapping("/cases/top")
-//    public List<LocalStats> getAllOrderByTotalCases() {
-//        return localStatsService.getAllOrderByTotalCases();
-//    }
 }

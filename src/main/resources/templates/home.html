@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Coronavirus Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 
@@ -13,7 +13,10 @@
 <!--<p th:text="${locationStats}"></p>-->
 <h1>Coronavirus Tracker</h1>
 <span th:text="${todayTotalCases}"></span>
-<span>Number of cases reported last day</span>
+<span>Number of cases reported last day<br></span>
+
+<span th:text="${totalCases}"></span>
+<span>Number of cases reported in total<br></span>
 <table>
     <tr>
         <th>Country</th>
