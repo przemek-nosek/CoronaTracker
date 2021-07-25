@@ -33,7 +33,6 @@ public class LocalStatsService {
     }
 
     @Scheduled(cron = "* 1 1 * * *")
-    @PostConstruct
     private void getCoronaVirusData() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder()
