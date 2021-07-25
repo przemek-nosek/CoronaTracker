@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pl.java.corona.coronavirustracker.controller.Parser;
 import pl.java.corona.coronavirustracker.model.GeoPosition;
 import pl.java.corona.coronavirustracker.model.LocalStats;
 import pl.java.corona.coronavirustracker.repository.LocalStatsRepository;
@@ -32,16 +33,17 @@ public class LocalStatsService {
         this.repository = repository;
     }
 
-    @Scheduled(cron = "* 1 1 * * *")
+    @Scheduled(cron = "* 5 1 * * *")
     private void getCoronaVirusData() throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(CSV_CORONA_VIRUS_DATA))
                 .GET()
-                .build();
+                .build(); // can be replaced with RestTemplate
 
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        List<LocalStats> localStatsDetails = readCsvFile(httpResponse);
+
+        List<LocalStats> localStatsDetails = Parser.parseCsvFile(httpResponse);
 
         updateDb(localStatsDetails);
         localStatsDetails.clear();
@@ -61,28 +63,7 @@ public class LocalStatsService {
         }
     }
 
-    private List<LocalStats> readCsvFile(HttpResponse<String> httpResponse) throws IOException {
-        StringReader body = new StringReader(httpResponse.body());
-        CSVParser records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(body);
-        List<LocalStats> localStats = new ArrayList<>();
 
-        for (CSVRecord record : records) {
-            String state = record.get("Province/State");
-            String country = record.get("Country/Region");
-            int totalCases = Integer.parseInt(record.get(record.size() - 1));
-            int dailyCases = totalCases - Integer.parseInt(record.get(record.size() - 2));
-
-            String lat = record.get("Lat");
-            String longitude = record.get("Long");
-            if (!lat.isBlank() && !longitude.isBlank()) {
-                GeoPosition geoPosition = new GeoPosition();
-                geoPosition.setLatitude(Double.parseDouble(lat));
-                geoPosition.setLongitude(Double.parseDouble(longitude));
-                localStats.add(new LocalStats(state, country, dailyCases, totalCases, geoPosition));
-            }
-        }
-        return localStats;
-    }
 
     public List<LocalStats> getAllStats() {
         return repository.findAll();
