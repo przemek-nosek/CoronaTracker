@@ -1,5 +1,6 @@
 package pl.java.corona.coronavirustracker.model;
 
+
 import javax.persistence.*;
 
 @Entity
@@ -15,20 +16,19 @@ public class LocalStats {
     private int dailyConfirmedCases;
     private int totalCases;
 
+    @Embedded
+    private GeoPosition geoPosition;
+
     public LocalStats() {
     }
 
-    public LocalStats(String state, String country, int dailyConfirmedCases) {
-        this.state = state;
-        this.country = country;
-        this.dailyConfirmedCases = dailyConfirmedCases;
-    }
 
-    public LocalStats(String state, String country, int dailyConfirmedCases, int totalCases) {
+    public LocalStats(String state, String country, int dailyConfirmedCases, int totalCases, GeoPosition geoPosition) {
         this.state = state;
         this.country = country;
         this.dailyConfirmedCases = dailyConfirmedCases;
         this.totalCases = totalCases;
+        this.geoPosition = geoPosition;
     }
 
     public Long getId() {
@@ -71,14 +71,11 @@ public class LocalStats {
         this.totalCases = totalCases;
     }
 
-    @Override
-    public String toString() {
-        return "LocalStats{" +
-                "id=" + id +
-                ", state='" + state + '\'' +
-                ", country='" + country + '\'' +
-                ", dailyConfirmedCases=" + dailyConfirmedCases +
-                ", totalCases=" + totalCases +
-                '}';
+    public GeoPosition getGeoPosition() {
+        return geoPosition;
+    }
+
+    public void setGeoPosition(GeoPosition geoPosition) {
+        this.geoPosition = geoPosition;
     }
 }

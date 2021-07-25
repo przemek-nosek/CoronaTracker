@@ -4,13 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import pl.java.corona.coronavirustracker.model.LocalStats;
 import pl.java.corona.coronavirustracker.service.LocalStatsService;
 
-import java.util.Comparator;
+
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Controller
 public class LocalStatsController {
@@ -24,13 +23,9 @@ public class LocalStatsController {
 
     @GetMapping("/")
     public String home(Model model) {
-        List<LocalStats> allStats = localStatsService.getAllStats();
+        List<LocalStats> allStats = localStatsService.getAllOrderByTotalCases();
 
-        List<LocalStats> collect = allStats.stream()
-                .sorted(Comparator.comparing(LocalStats::getTotalCases).reversed())
-                .collect(Collectors.toList());
-
-        model.addAttribute("locationStats", collect);
+        model.addAttribute("locationStats", allStats);
 
         int todayTotalCases = allStats.stream()
                 .map(LocalStats::getDailyConfirmedCases)
@@ -45,6 +40,15 @@ public class LocalStatsController {
         model.addAttribute("totalCases", totalCases);
 
         return "home";
+    }
+
+    @GetMapping("/map")
+    public String map(Model model) {
+        List<LocalStats> stats = localStatsService.getAllStats();
+
+        model.addAttribute("points", stats);
+
+        return "map";
     }
 
 }

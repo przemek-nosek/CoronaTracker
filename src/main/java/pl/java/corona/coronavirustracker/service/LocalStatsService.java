@@ -3,11 +3,10 @@ package pl.java.corona.coronavirustracker.service;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pl.java.corona.coronavirustracker.model.GeoPosition;
 import pl.java.corona.coronavirustracker.model.LocalStats;
 import pl.java.corona.coronavirustracker.repository.LocalStatsRepository;
 
@@ -23,8 +22,6 @@ import java.util.List;
 
 @Service
 public class LocalStatsService {
-
-    private final Logger logger = LoggerFactory.getLogger(LocalStatsService.class);
 
     private static final String CSV_CORONA_VIRUS_DATA = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
 
@@ -75,7 +72,15 @@ public class LocalStatsService {
             String country = record.get("Country/Region");
             int totalCases = Integer.parseInt(record.get(record.size() - 1));
             int dailyCases = totalCases - Integer.parseInt(record.get(record.size() - 2));
-            localStats.add(new LocalStats(state, country, dailyCases, totalCases));
+
+            String lat = record.get("Lat");
+            String longitude = record.get("Long");
+            if (!lat.isBlank() && !longitude.isBlank()) {
+                GeoPosition geoPosition = new GeoPosition();
+                geoPosition.setLatitude(Double.parseDouble(lat));
+                geoPosition.setLongitude(Double.parseDouble(longitude));
+                localStats.add(new LocalStats(state, country, dailyCases, totalCases, geoPosition));
+            }
         }
         return localStats;
     }
